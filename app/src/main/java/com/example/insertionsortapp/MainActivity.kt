@@ -43,7 +43,7 @@ fun InsertionSortApp() {
                     .padding(innerPadding)
                     .padding(16.dp)
             ) {
-                Text(text = "Enter numbers (0-9) separated by spaces:")
+                Text(text = "Enter Numbers (0-9) Separated By Spaces:")
 
                 TextField(
                     value = inputText,
@@ -104,7 +104,7 @@ fun performSort(input: String, onResult: (List<String>, String?) -> Unit) {
 
     // Validate input size
     if (numbers.size !in 3..8) {
-        onResult(emptyList(), "Input size must be between 3 and 8 numbers.")
+        onResult(emptyList(), "Error Message: Input size must be between 3 and 8 numbers.")
         return
     }
 
