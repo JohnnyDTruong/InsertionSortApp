@@ -109,13 +109,13 @@ fun performSort(input: String, onResult: (List<List<Pair<Int, Boolean>>>, String
         input.mapNotNull { it.toString().toIntOrNull() } // Handle continuous input
     }
 
-    // Validate input size
+    // Validate input size range
     if (numbers.size !in 3..8) {
         onResult(emptyList(), "Error message: Input size must be between 3 and 8 numbers.")
         return
     }
 
-    // Validate input size range (only 0-9 allowed)
+    // Validate input range (only 0-9 allowed)
     if (numbers.any { it !in 0..9 }) {
         onResult(emptyList(), "Error message: All numbers must be between 0 and 9.")
         return
