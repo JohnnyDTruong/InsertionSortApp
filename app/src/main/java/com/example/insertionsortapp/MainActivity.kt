@@ -8,8 +8,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,11 +27,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InsertionSortApp() {
     var inputText by remember { mutableStateOf("") }
-    var sortingSteps by remember { mutableStateOf<List<String>>(emptyList()) }
+    var sortingSteps by remember { mutableStateOf<List<List<Pair<Int, Boolean>>>>(emptyList()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -43,7 +42,7 @@ fun InsertionSortApp() {
                     .padding(innerPadding)
                     .padding(16.dp)
             ) {
-                Text(text = "Enter Numbers (0-9) Separated By Spaces:")
+                Text(text = "Enter Numbers (0-9) To Sort:")
 
                 TextField(
                     value = inputText,
@@ -86,53 +85,69 @@ fun InsertionSortApp() {
 
                 Text(text = "Sorting Steps:")
 
-                sortingSteps.forEach { step ->
-                    Text(text = step)
+                sortingSteps.forEachIndexed { stepIndex, step ->
+                    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                        Text(text = "Step ${stepIndex + 1}: ")
+                        step.forEach { (number, isSorted) ->
+                            Text(
+                                text = "$number ",
+                                color = if (isSorted) Color.Green else Color.Red
+                            )
+                        }
+                    }
                 }
             }
         }
     )
 }
 
-fun performSort(input: String, onResult: (List<String>, String?) -> Unit) {
-    // Modify parsing to handle both spaced and non-spaced numbers
+fun performSort(input: String, onResult: (List<List<Pair<Int, Boolean>>>, String?) -> Unit) {
+    // Split numbers based on spaces or treat as continuous digits
     val numbers = if (input.contains(" ")) {
-        input.split(" ").mapNotNull { it.toIntOrNull() }
+        input.split(" ").mapNotNull { it.toIntOrNull() } // Handle spaced input
     } else {
-        input.mapNotNull { it.toString().toIntOrNull() }
+        input.mapNotNull { it.toString().toIntOrNull() } // Handle continuous input
     }
 
     // Validate input size
     if (numbers.size !in 3..8) {
-        onResult(emptyList(), "Error Message: Input size must be between 3 and 8 numbers.")
+        onResult(emptyList(), "Error message: Input size must be between 3 and 8 numbers.")
         return
     }
 
-    // Validate input range
+    // Validate input size range (only 0-9 allowed)
     if (numbers.any { it !in 0..9 }) {
-        onResult(emptyList(), "All numbers must be between 0 and 9.")
+        onResult(emptyList(), "Error message: All numbers must be between 0 and 9.")
         return
     }
 
-    val steps = mutableListOf(numbers.joinToString(" "))
+    val steps = mutableListOf<List<Pair<Int, Boolean>>>()
     val array = numbers.toMutableList()
 
-    // Perform insertion sort and capture each step
+    // Initial step with all numbers unsorted
+    steps.add(array.map { it to false })
+
+    // Perform insertion sort and capture each step with color-coding
+    // Red for Not Sorted Yet
+    // Green for Sorted
     for (i in 1 until array.size) {
         val key = array[i]
         var j = i - 1
 
-        // Shift elements of array[0..i-1], that are greater than key,
-        // to one position ahead of their current position
+        // Shift elements that are greater than key
         while (j >= 0 && array[j] > key) {
             array[j + 1] = array[j]
             j--
         }
         array[j + 1] = key
-        steps.add(array.joinToString(" "))
+
+        // Mark sorted elements up to index i
+        steps.add(array.mapIndexed { index, value ->
+            value to (index <= i)
+        })
     }
 
-    onResult(steps, null)
+    onResult(steps, null) // Return sorted steps with no error
 }
 
 @Preview(showBackground = true)
