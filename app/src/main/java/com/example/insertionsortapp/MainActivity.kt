@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//App UI
 @Composable
 fun InsertionSortApp() {
     var inputText by remember { mutableStateOf("") }
@@ -101,6 +102,7 @@ fun InsertionSortApp() {
     )
 }
 
+//app functions
 fun performSort(input: String, onResult: (List<List<Pair<Int, Boolean>>>, String?) -> Unit) {
     // Split numbers based on spaces or treat as continuous digits
     val numbers = if (input.contains(" ")) {
@@ -150,6 +152,7 @@ fun performSort(input: String, onResult: (List<List<Pair<Int, Boolean>>>, String
     onResult(steps, null) // Return sorted steps with no error
 }
 
+//Display the App
 @Preview(showBackground = true)
 @Composable
 fun InsertionSortAppPreview() {
